@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Is Swift Compiled or Interpreted? The Short Answer</title>
-<meta name="description" content="Swift is compiled ahead of time to machine code through the LLVM compiler backend. It has no virtual machine and no tracing garbage collector.">
+<title>About the author</title>
+<meta name="description" content="Adam Zachary Wasserman: author, independent researcher, forty years in enterprise software. Why isitcompiled.com exists and how to verify its numbers.">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
 <meta name="author" content="Adam Zachary Wasserman">
-<link rel="canonical" href="https://isitcompiled.com/swift.html">
+<link rel="canonical" href="https://isitcompiled.com/about.html">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0c'/%3E%3Ctext x='4' y='23' font-family='monospace' font-size='18' font-weight='700' fill='%232a9d8f'%3E%3E_%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="isitcompiled.com">
-<meta property="og:title" content="Is Swift Compiled or Interpreted? The Short Answer">
-<meta property="og:description" content="Swift is compiled ahead of time to machine code through the LLVM compiler backend. It has no virtual machine and no tracing garbage collector.">
-<meta property="og:url" content="https://isitcompiled.com/swift.html">
+<meta property="og:title" content="About the author">
+<meta property="og:description" content="Adam Zachary Wasserman: author, independent researcher, forty years in enterprise software. Why isitcompiled.com exists and how to verify its numbers.">
+<meta property="og:url" content="https://isitcompiled.com/about.html">
 <meta property="og:image" content="https://isitcompiled.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Is Swift Compiled or Interpreted? The Short Answer">
-<meta name="twitter:description" content="Swift is compiled ahead of time to machine code through the LLVM compiler backend. It has no virtual machine and no tracing garbage collector.">
+<meta name="twitter:title" content="About the author">
+<meta name="twitter:description" content="Adam Zachary Wasserman: author, independent researcher, forty years in enterprise software. Why isitcompiled.com exists and how to verify its numbers.">
 <meta name="twitter:image" content="https://isitcompiled.com/og.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "Is Swift Compiled or Interpreted? The Short Answer", "description": "Swift is compiled ahead of time to machine code through the LLVM compiler backend. It has no virtual machine and no tracing garbage collector.", "url": "https://isitcompiled.com/swift.html", "mainEntityOfPage": "https://isitcompiled.com/swift.html", "datePublished": "2026-10-05", "dateModified": "2026-10-05", "inLanguage": "en", "author": {"@type": "Person", "name": "Adam Zachary Wasserman", "url": "https://honestcode.software", "sameAs": ["https://github.com/adamzwasserman", "https://adamzacharywasserman.com", "https://orcid.org/0009-0002-8865-6583", "https://www.wikidata.org/wiki/Q140256458"]}, "publisher": {"@type": "Organization", "name": "isitcompiled.com", "url": "https://isitcompiled.com/"}, "image": "https://isitcompiled.com/og.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Is it compiled?", "item": "https://isitcompiled.com/"}, {"@type": "ListItem", "position": 2, "name": "Is Swift compiled?", "item": "https://isitcompiled.com/swift.html"}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Swift interpreted?", "acceptedAnswer": {"@type": "Answer", "text": "No. Swift is compiled ahead of time to machine code, even though it offers a REPL and scripts for convenience."}}, {"@type": "Question", "name": "Does Swift have a garbage collector?", "acceptedAnswer": {"@type": "Answer", "text": "No. Swift uses automatic reference counting."}}, {"@type": "Question", "name": "What compiler does Swift use?", "acceptedAnswer": {"@type": "Answer", "text": "swiftc, which uses LLVM to produce machine code."}}]}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "ProfilePage", "name": "About the author", "url": "https://isitcompiled.com/about.html", "mainEntity": {"@type": "Person", "name": "Adam Zachary Wasserman", "url": "https://honestcode.software", "sameAs": ["https://github.com/adamzwasserman", "https://adamzacharywasserman.com", "https://orcid.org/0009-0002-8865-6583", "https://www.wikidata.org/wiki/Q140256458"], "description": "Author and independent researcher with forty years in enterprise software, including CTO at IATA and Director of Consulting at CGI."}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Is it compiled?", "item": "https://isitcompiled.com/"}, {"@type": "ListItem", "position": 2, "name": "About the author", "item": "https://isitcompiled.com/about.html"}]}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Literata:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -48,21 +48,14 @@
 <body>
 <nav><a href="/">Speed</a><a href="/memory.html">Memory</a><a href="/languages.html">Languages</a><a href="/objections.html">Objections</a><a href="/check-our-work.html">Check our work</a></nav>
 <main>
-<h1>Is Swift compiled or interpreted?</h1>
-<p class="answer">Swift is compiled ahead of time to machine code through the LLVM compiler backend. It has no virtual machine and no tracing garbage collector.</p>
-<h2>How it runs your code</h2>
-<p>The Swift compiler, swiftc, turns your source into machine code before the program runs. Memory is managed by automatic reference counting, which frees objects when their last reference goes away. Swift can run scripts and a REPL, but production Swift is compiled.</p>
-<h2>Does that make Swift slow?</h2>
-<p>Swift's optimizer works before the program runs, and you choose between an unoptimized debug build and an optimized release build. Always time a release build.</p>
-<h2>Questions</h2>
-<h3>Is Swift interpreted?</h3>
-<p>No. Swift is compiled ahead of time to machine code, even though it offers a REPL and scripts for convenience.</p>
-<h3>Does Swift have a garbage collector?</h3>
-<p>No. Swift uses automatic reference counting.</p>
-<h3>What compiler does Swift use?</h3>
-<p>swiftc, which uses LLVM to produce machine code.</p>
-<h2>Related</h2>
-<p><a href="/rust.html">Is Rust compiled?</a> &middot; <a href="/cpp.html">Is C++ compiled?</a> &middot; <a href="/go.html">Is Go compiled?</a> &middot; <a href="/compiled-vs-interpreted.html">Compiled vs interpreted</a> &middot; <a href="/">Why optimization decides speed</a></p>
+<h1>About the author</h1>
+<p class="answer">Adam Zachary Wasserman is an author and independent researcher with forty years in enterprise software, including time as CTO at IATA and Director of Consulting at CGI.</p>
+<h2>Why this site exists</h2>
+<p>Adam wrote <a href="https://honestcode.software">Honest Code: Stop Fighting the Machine</a>, a book on software architecture. Its argument is that most complexity in production code comes from hiding state inside classes. To test that argument across languages, he built a set of programs and timed them in 11 languages. This site reports what the timings show about compilers, interpreters and optimizers.</p>
+<h2>How to verify the work</h2>
+<p>Every number comes from code in a public repository, <a href="https://github.com/adamzwasserman/honest-code-traces">honest-code-traces</a>. The page <a href="/check-our-work.html">Check our work</a> lists the tools, versions and limits. If you find a mistake, <a href="https://github.com/adamzwasserman/honest-code-traces/issues">open an issue</a>.</p>
+<h2>Elsewhere</h2>
+<p><a href="https://adamzacharywasserman.com">adamzacharywasserman.com</a> &middot; <a href="https://orcid.org/0009-0002-8865-6583">ORCID</a> &middot; <a href="https://www.wikidata.org/wiki/Q140256458">Wikidata</a> &middot; <a href="https://github.com/adamzwasserman">GitHub</a></p>
 </main>
 <footer>
 <p>Is it compiled or interpreted? <a href="/python.html">Python</a> &middot; <a href="/java.html">Java</a> &middot; <a href="/javascript.html">JavaScript</a> &middot; <a href="/typescript.html">TypeScript</a> &middot; <a href="/cpp.html">C++</a> &middot; <a href="/csharp.html">C#</a> &middot; <a href="/go.html">Go</a> &middot; <a href="/rust.html">Rust</a> &middot; <a href="/kotlin.html">Kotlin</a> &middot; <a href="/swift.html">Swift</a> &middot; <a href="/ruby.html">Ruby</a> &middot; <a href="/php.html">PHP</a> &middot; <a href="/lua.html">Lua</a> &middot; <a href="/perl.html">Perl</a></p>

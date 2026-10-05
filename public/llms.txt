@@ -29,3 +29,4 @@ Author: Adam Zachary Wasserman. Data and code: https://github.com/adamzwasserman
 - [Memory layout vs language](https://isitcompiled.com/memory.html): data layout can matter more than the language
 - [Objections](https://isitcompiled.com/objections.html): eight common objections and the answers
 - [Check our work](https://isitcompiled.com/check-our-work.html): tools, versions, data and limits
+- [About the author](https://isitcompiled.com/about.html): who wrote this site, with credentials and links
