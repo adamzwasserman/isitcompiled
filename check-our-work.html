@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How We Measured: Tools, Versions and Data</title>
+<meta name="description" content="The program, the timing tools, the language versions, where the raw data lives, and the limits of every number on isitcompiled.com.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Literata:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0c; --fg:#c8c8d0; --muted:#9a9aa8; --bar:#e63946; --bar2:#2a9d8f; --bar3:#e63946; --gold:#e9c46a; --line:#1e1e26; --box:#111116; --mono:'JetBrains Mono',ui-monospace,monospace; --serif:'Literata',Georgia,serif; }
+  body { background:var(--bg); color:var(--fg); font:18px/1.6 var(--serif); max-width:42rem; margin:0 auto; padding:2rem 1rem; }
+  h1 { font-size:1.6rem; line-height:1.25; }
+  h1 em { font-style:normal; text-transform:uppercase; border-bottom:3px solid var(--bar2); }
+  h2 { font-size:1.2rem; margin-top:2rem; }
+  a { color:var(--bar2); }
+  nav { display:flex; flex-wrap:wrap; gap:1rem; font-size:.95rem; border-bottom:1px solid var(--line); padding-bottom:.75rem; margin-bottom:1.5rem; }
+  footer { border-top:1px solid var(--line); margin-top:3rem; padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  table { border-collapse:collapse; width:100%; font-size:.95rem; }
+  th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); }
+  td.n, th.n { text-align:right; }
+  h1, h2, nav, .label, .stops, label.power, th, code, pre, .callout { font-family:var(--mono); }
+  h1, h2 { color:var(--fg); }
+  input { accent-color:var(--bar2); }
+</style>
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<meta name="author" content="Adam Zachary Wasserman">
+<link rel="canonical" href="https://isitcompiled.com/check-our-work.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0c'/%3E%3Ctext x='4' y='23' font-family='monospace' font-size='18' font-weight='700' fill='%232a9d8f'%3E%3E_%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="isitcompiled.com">
+<meta property="og:title" content="How We Measured: Tools, Versions and Data">
+<meta property="og:description" content="The program, the timing tools, the language versions, where the raw data lives, and the limits of every number on isitcompiled.com.">
+<meta property="og:url" content="https://isitcompiled.com/check-our-work.html">
+<meta property="og:image" content="https://isitcompiled.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How We Measured: Tools, Versions and Data">
+<meta name="twitter:description" content="The program, the timing tools, the language versions, where the raw data lives, and the limits of every number on isitcompiled.com.">
+<meta name="twitter:image" content="https://isitcompiled.com/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "How We Measured: Tools, Versions and Data", "description": "The program, the timing tools, the language versions, where the raw data lives, and the limits of every number on isitcompiled.com.", "url": "https://isitcompiled.com/check-our-work.html", "mainEntityOfPage": "https://isitcompiled.com/check-our-work.html", "datePublished": "2026-10-05", "dateModified": "2026-10-05", "inLanguage": "en", "author": {"@type": "Person", "name": "Adam Zachary Wasserman", "url": "https://honestcode.software", "sameAs": ["https://github.com/adamzwasserman"]}, "publisher": {"@type": "Organization", "name": "isitcompiled.com", "url": "https://isitcompiled.com/"}, "image": "https://isitcompiled.com/og.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Is it compiled?", "item": "https://isitcompiled.com/"}, {"@type": "ListItem", "position": 2, "name": "Check our work", "item": "https://isitcompiled.com/check-our-work.html"}]}]}</script>
+</head>
+<body>
+<nav><a href="/">Speed</a><a href="/memory.html">Memory</a><a href="/languages.html">Languages</a><a href="/objections.html">Objections</a><a href="/check-our-work.html">Check our work</a></nav>
+<main>
+<h1>Check our work</h1>
+<p>Every number on this site comes from code you can run. The code and the raw results live in one public repository: <a href="https://github.com/adamzwasserman/honest-code-traces">github.com/adamzwasserman/honest-code-traces</a>.</p>
+<h2>The program</h2>
+<p>One small program: build an order, add three items, apply a coupon, then compute the total, the discount, the tax and the grand total. We wrote it in 11 languages, as an average programmer would, with a class and separate method calls. We also wrote a version made of plain functions. Neither version is tuned for performance. The class timings leave out timestamp writes.</p>
+<h2>Tools and versions</h2>
+<table>
+<tr><th>Language</th><th>Version</th><th>Timing tool</th></tr>
+<tr><td>C++</td><td>g++ 15.2.0</td><td>Google Benchmark, five repetitions</td></tr>
+<tr><td>Java</td><td>OpenJDK 21.0.12</td><td>JMH, three forks of five one-second iterations</td></tr>
+<tr><td>JavaScript</td><td>Node 22.23.3 (V8)</td><td>mitata, one process per setting</td></tr>
+<tr><td>Python</td><td>CPython 3.14.4, PyPy 7.3.20</td><td>pyperf, ten processes of five values</td></tr>
+<tr><td>Ruby</td><td>Ruby 3.3.8</td><td>benchmark-ips</td></tr>
+<tr><td>PHP</td><td>PHP 8.5.4</td><td>the program's own loop, three runs</td></tr>
+</table>
+<p>Everything ran in an Ubuntu 26.04 container on a rented eight-core virtual machine.</p>
+<h2>Where the data lives</h2>
+<p>The optimizer settings are in <code>measured/optimizer-dial</code>, and the memory layout runs are in <code>measured/layout</code>, <code>measured/layout-others</code> and <code>measured/layout-raw</code>. The scripts are in <code>harness/dial</code>, <code>harness/layout</code> and <code>harness/checks</code>. HotSpot's own log of what it inlined is in <code>measured/optimizer-dial/inlining</code>.</p>
+<h2>Limits</h2>
+<ul>
+<li>The server is a virtual machine and hides its real cache layout.</li>
+<li>We ran each V8 setting in one process, so those rows have no spread figure.</li>
+<li>PyPy implements Python 3.11, not 3.14.</li>
+<li>Ruby has no JIT row, because our Ruby build lacks YJIT.</li>
+<li>The program is small and every figure covers one scenario.</li>
+<li>The memory layout pages demonstrate a textbook effect. They are not a study.</li>
+</ul>
+<p>If you find a mistake, <a href="https://github.com/adamzwasserman/honest-code-traces/issues">open an issue</a>.</p>
+</main>
+<footer>
+<p>Is it compiled or interpreted? <a href="/python.html">Python</a> &middot; <a href="/java.html">Java</a> &middot; <a href="/javascript.html">JavaScript</a> &middot; <a href="/typescript.html">TypeScript</a> &middot; <a href="/cpp.html">C++</a> &middot; <a href="/csharp.html">C#</a> &middot; <a href="/go.html">Go</a> &middot; <a href="/rust.html">Rust</a> &middot; <a href="/kotlin.html">Kotlin</a> &middot; <a href="/swift.html">Swift</a> &middot; <a href="/ruby.html">Ruby</a> &middot; <a href="/php.html">PHP</a> &middot; <a href="/lua.html">Lua</a> &middot; <a href="/perl.html">Perl</a></p>
+<p><a href="/compiled-vs-interpreted.html">Compiled vs interpreted</a> &middot; <a href="/languages.html">All languages</a> &middot; <a href="/objections.html">Objections</a> &middot; <a href="/check-our-work.html">Check our work</a></p>
+<p class="byline">By Adam Zachary Wasserman. Updated <time datetime="2026-10-05">5 October 2026</time>. Every number comes from <a href="/check-our-work.html">code you can rerun</a>.</p>
+</footer>
+</body>
+</html>

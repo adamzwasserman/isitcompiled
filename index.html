@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is It Compiled or Interpreted? Speed Comes From Optimization</title>
+<meta name="description" content="Python, Java, JavaScript, Ruby and PHP all compile before they run. Measured times show optimization, not compilation, decides speed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Literata:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0c; --fg:#c8c8d0; --muted:#9a9aa8; --bar:#e63946; --bar2:#2a9d8f; --bar3:#e63946; --gold:#e9c46a; --line:#1e1e26; --box:#111116; --mono:'JetBrains Mono',ui-monospace,monospace; --serif:'Literata',Georgia,serif; }
+  body { background:var(--bg); color:var(--fg); font:18px/1.6 var(--serif); max-width:42rem; margin:0 auto; padding:2rem 1rem; }
+  h1 { font-size:1.6rem; line-height:1.25; }
+  h1 em { font-style:normal; text-transform:uppercase; border-bottom:3px solid var(--bar2); }
+  input[type=range] { width:100%; }
+  .stops { display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); }
+  .row { margin:1rem 0; }
+  .label { display:flex; justify-content:space-between; font-size:.95rem; }
+  .track { background:var(--box); height:1.6rem; border-radius:4px; overflow:hidden; }
+  .fill { height:100%; background:var(--bar); transition:width .3s; }
+  .fill.honest { background:var(--bar2); }
+  h2 { font-size:1.2rem; margin-top:2rem; }
+  .callout { border-left:4px solid var(--gold); background:var(--box); padding:.75rem 1rem; border-radius:0 6px 6px 0; font-weight:600; }
+  .note { background:var(--box); padding:.75rem 1rem; border-radius:6px; }
+  .tech { display:none; font-size:.85rem; color:var(--muted); border-top:1px solid var(--line); margin-top:1.5rem; padding-top:1rem; }
+  body.power .tech { display:block; }
+  .tech code { background:var(--box); padding:0 .25rem; }
+  label.power { font-size:.9rem; color:var(--muted); margin-left:auto; }
+  nav { display:flex; flex-wrap:wrap; gap:1rem; font-size:.95rem; border-bottom:1px solid var(--line); padding-bottom:.75rem; margin-bottom:1.5rem; }
+  footer { border-top:1px solid var(--line); margin-top:3rem; padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  a { color:var(--bar2); }
+  h1, h2, nav, .label, .stops, label.power, th, code, pre, .callout { font-family:var(--mono); }
+  h1, h2 { color:var(--fg); }
+  input { accent-color:var(--bar2); }
+</style>
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<meta name="author" content="Adam Zachary Wasserman">
+<link rel="canonical" href="https://isitcompiled.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0c'/%3E%3Ctext x='4' y='23' font-family='monospace' font-size='18' font-weight='700' fill='%232a9d8f'%3E%3E_%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="isitcompiled.com">
+<meta property="og:title" content="Is It Compiled or Interpreted? Speed Comes From Optimization">
+<meta property="og:description" content="Python, Java, JavaScript, Ruby and PHP all compile before they run. Measured times show optimization, not compilation, decides speed.">
+<meta property="og:url" content="https://isitcompiled.com/">
+<meta property="og:image" content="https://isitcompiled.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Is It Compiled or Interpreted? Speed Comes From Optimization">
+<meta name="twitter:description" content="Python, Java, JavaScript, Ruby and PHP all compile before they run. Measured times show optimization, not compilation, decides speed.">
+<meta name="twitter:image" content="https://isitcompiled.com/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "name": "isitcompiled.com", "url": "https://isitcompiled.com/", "description": "Python, Java, JavaScript, Ruby and PHP all compile before they run. Measured times show optimization, not compilation, decides speed.", "inLanguage": "en", "author": {"@type": "Person", "name": "Adam Zachary Wasserman", "url": "https://honestcode.software", "sameAs": ["https://github.com/adamzwasserman"]}}, {"@type": "TechArticle", "headline": "Is It Compiled or Interpreted? Speed Comes From Optimization", "description": "Python, Java, JavaScript, Ruby and PHP all compile before they run. Measured times show optimization, not compilation, decides speed.", "url": "https://isitcompiled.com/", "mainEntityOfPage": "https://isitcompiled.com/", "datePublished": "2026-10-05", "dateModified": "2026-10-05", "inLanguage": "en", "author": {"@type": "Person", "name": "Adam Zachary Wasserman", "url": "https://honestcode.software", "sameAs": ["https://github.com/adamzwasserman"]}, "publisher": {"@type": "Organization", "name": "isitcompiled.com", "url": "https://isitcompiled.com/"}, "image": "https://isitcompiled.com/og.png"}]}</script>
+</head>
+<body>
+<nav><a href="/">Speed</a><a href="/memory.html">Memory</a><a href="/languages.html">Languages</a><a href="/objections.html">Objections</a><a href="/check-our-work.html">Check our work</a><label class="power"><input type="checkbox" id="power"> Show technical details</label></nav>
+<main>
+<div class="callout" id="hook" style="font-weight:400">
+<strong id="hooktext">Python is a compiled language.</strong>
+<span id="hookcatch">CPython compiles every file to bytecode before it runs. The catch: bytecode is not machine code.</span>
+<a id="hooklink" href="/python.html">Read more</a>
+</div>
+
+<h1>JavaScript, Python, Ruby and PHP are not slow because they are &ldquo;interpreted&rdquo;. They all <em>compile</em> your code before they run it. Speed comes from optimization, which happens either before the program runs or while it runs.</h1>
+<p>In fact: before optimization Python can be faster than Java, and in some cases faster than C++. C++ is faster than Java before optimizations, and after optimizations faster in some areas, slower in others. Code written to V8 can keep up with C++ on some jobs and beat Go.</p>
+<p>We wrote one small program, an order with items, a coupon, a discount and tax, and implemented it in 11 languages, keeping the versions as close to each other as the languages allow. An optimizer can work before the program runs (static optimization, as with C++ at -O2) or while it runs (JIT optimization, as in the Java VM). The dial below changes only the JIT. The Java compiler does almost no static optimizing, so the JIT does the work. Turn it up and watch the time per call. The next two dials run the Python and C++ versions, so you can compare. All the bars use one scale.</p>
+
+<p class="callout">None of this code is tweaked for performance. Each language can run faster if someone tunes the code for it. This code represents average code.</p>
+
+<input type="range" id="dial" min="0" max="3" value="0" step="1" aria-label="JIT setting">
+<div class="stops"><span>No JIT</span><span>First-tier JIT</span><span>Second-tier JIT</span><span>Full JIT</span></div>
+
+<div class="row"><div class="label"><span>Typical class code</span><span id="dv"></span></div><div class="track"><div class="fill" id="df"></div></div></div>
+<div class="row"><div class="label"><span>Plain functions</span><span id="hv"></span></div><div class="track"><div class="fill honest" id="hf"></div></div></div>
+<p class="note" id="says"></p>
+
+<h2>Python</h2>
+<input type="range" id="pdial" min="0" max="2" value="0" step="1" aria-label="Python implementation">
+<div class="stops"><span>CPython, no JIT</span><span>CPython, experimental JIT</span><span>PyPy, JIT</span></div>
+
+<div class="row"><div class="label"><span>Typical class code</span><span id="pdv"></span></div><div class="track"><div class="fill" id="pdf"></div></div></div>
+<div class="row"><div class="label"><span>Plain functions</span><span id="phv"></span></div><div class="track"><div class="fill honest" id="phf"></div></div></div>
+<p class="note" id="psays"></p>
+
+<h2>JavaScript</h2>
+<input type="range" id="jdial" min="0" max="2" value="0" step="1" aria-label="V8 JIT setting">
+<div class="stops"><span>No JIT</span><span>No optimizing JIT</span><span>Full JIT</span></div>
+
+<div class="row"><div class="label"><span>Typical class code</span><span id="jdv"></span></div><div class="track"><div class="fill" id="jdf"></div></div></div>
+<div class="row"><div class="label"><span>Plain functions</span><span id="jhv"></span></div><div class="track"><div class="fill honest" id="jhf"></div></div></div>
+<p class="note" id="jsays"></p>
+
+<h2 id="cpp">C++ (static optimization)</h2>
+<p>C++ has no JIT. The compiler optimizes once, before the program runs, and the setting is fixed at build time.</p>
+<input type="range" id="cdial" min="0" max="3" value="0" step="1" aria-label="C++ optimization level">
+<div class="stops"><span>-O0</span><span>-O1</span><span>-O2</span><span>-O3</span></div>
+
+<div class="row"><div class="label"><span>Typical class code</span><span id="cdv"></span></div><div class="track"><div class="fill" id="cdf"></div></div></div>
+<div class="row"><div class="label"><span>Plain functions</span><span id="chv"></span></div><div class="track"><div class="fill honest" id="chf"></div></div></div>
+<p class="note" id="csays"></p>
+
+<h2>Common objections</h2>
+<p>Isn't Python interpreted? Isn't Java interpreted until the JIT starts? <a href="/objections.html">Read the answers</a>, or <a href="/check-our-work.html">check our work</a>.</p>
+
+<p>Optimization is half of the story. <a href="/memory.html">How your data sits in memory</a> decides the other half.</p>
+
+<p><strong>What does this mean for your code? Find out here:</strong> <a href="https://honestcode.software">honestcode.software</a></p>
+
+<div class="tech">
+  <p><strong>JVM setting:</strong> <code id="flag"></code></p>
+  <p><strong>Spread:</strong> <span id="err"></span></p>
+  <p><strong>Method:</strong> JMH, three forks of five one-second iterations, class code timed without timestamp writes. Python was measured with pyperf, ten processes of five values each, in the Ubuntu 26.04 container that ran the Java benchmarks. The first two stops are CPython 3.14.4 with <code>PYTHON_JIT=0</code> and <code>PYTHON_JIT=1</code>. The third is PyPy 7.3.20, which implements Python 3.11, so it is a different language version from the other two. PyPy spread: class code 202 to 467 ns, functions 126 to 168 ns.</p>
+  <p><strong>The Python code</strong>, shortened by dropping the timestamp writes, which the timed figure leaves out. The Java class follows these steps. The full source is <code>honest-code-traces/harness/python/harness_v2.py</code>.</p>
+  <pre style="background:var(--box);padding:.75rem;overflow-x:auto;font-size:.8rem;color:var(--fg)">class Order:
+    def __init__(self):
+        self._items = []
+        self._total = 0.0
+        self._discount = 0.0
+        self._tax = 0.0
+        self._coupon_code = ""
+
+    def add_item(self, item):    self._items.append(item)
+    def apply_coupon(self, code): self._coupon_code = code
+    def calc_total(self):
+        total = 0.0
+        for i in self._items:
+            total += i[1]
+        self._total = total
+    def calc_discount(self):
+        self._discount = self._total * CouponRegistry.get_instance().lookup(self._coupon_code)
+    def calc_tax(self):
+        self._tax = TaxService.get_instance().calculate("NY", self._total - self._discount)
+    def grand_total(self):
+        return self._total - self._discount + self._tax
+
+def dishonest_scenario(items):
+    order = Order()
+    for it in items:
+        order.add_item(it)
+    order.apply_coupon("SAVE10")
+    order.calc_total()
+    order.calc_discount()
+    order.calc_tax()
+    return order.grand_total()</pre>
+  <p><strong>JavaScript:</strong> the TypeScript version of the program, run with tsx on Node 22 (V8) and timed with mitata, one process per setting, so there is no spread figure. The stops are <code>--jitless</code>, <code>--no-opt</code> and the default flags.</p>
+  <p><strong>Go:</strong> the page has no Go dial. In the 11-language harness, Go (go test with b.Loop) takes 311 ns on the class code and 43 ns on the plain functions. JavaScript on V8 takes 124 ns and 99 ns, so V8 is about 2.5 times faster on the class code and about 2.3 times slower on the plain functions.</p>
+  <p><strong>C++:</strong> g++ in the container that ran the Java benchmarks, Google Benchmark, five repetitions, one level per build (-O0 to -O3). The class code is slower at -O3 than at -O2, and the page reports it as measured.</p>
+  <p><strong>Allocation:</strong> with the full JIT the class version allocates about 0 bytes per call and the plain functions 56. With escape analysis off they allocate 176 and 200.</p>
+  <p><strong>What HotSpot did:</strong> with the full JIT it compiled the 15 steps into one method and inlined every Order call. Raw log: <code>honest-code-traces/measured/optimizer-dial/inlining/inlining.log</code>.</p>
+</div>
+
+<script>
+const stops = [
+  { dishonest:3234.6, honest:2464.4, derr:199.9, herr:170.7, flag:"-Xint", says:"With the JIT off, the compiled Java runs slower than Python." },
+  { dishonest:212.0, honest:127.6, derr:6.7, herr:9.2, flag:"-XX:TieredStopAtLevel=1", says:"Turning on the first-tier JIT makes it about 15 times faster." },
+  { dishonest:47.6, honest:34.6, derr:3.4, herr:2.6, flag:"-XX:-TieredCompilation", says:"The second-tier JIT alone gets within a few nanoseconds of full speed." },
+  { dishonest:40.0, honest:23.0, derr:2.0, herr:1.2, flag:"(default, no flags)", says:"With the full JIT, the 15 steps run as one block of machine code and the program never builds the Order object." }
+];
+const pystops = [
+  { dishonest:1531.4, honest:708.1, says:"CPython 3.14 with no JIT. It adapts its bytecode as it runs, but it does not compile to machine code." },
+  { dishonest:1569.8, honest:661.5, says:"CPython 3.14 with its experimental JIT turned on. The times barely move." },
+  { dishonest:270.4, honest:135.4, says:"PyPy has a full JIT, and it runs this program about five times faster than CPython. It implements Python 3.11." }
+];
+const jsstops = [
+  { dishonest:1698.6, honest:856.2, says:"With the JIT off, V8 runs the program from bytecode. The class code takes 1,699 ns, close to CPython at 1,531 ns." },
+  { dishonest:1226.1, honest:587.0, says:"With V8's optimizing compilers off, the times drop by about a quarter to a third." },
+  { dishonest:124.3, honest:99.2, says:"With the full JIT, V8 is about 14 times faster than with no JIT on the class code, and about 9 times faster on the plain functions." }
+];
+const cppstops = [
+  { dishonest:2026.7, honest:561.8, flag:"-O0", says:"With no static optimization, C++ is slower than Python." },
+  { dishonest:161.9, honest:37.2, flag:"-O1", says:"Basic optimization makes the class code about 12 times faster." },
+  { dishonest:106.2, honest:25.1, flag:"-O2", says:"At -O2 the plain functions take 25 ns, close to Java with its full JIT at 23 ns. The class code takes 106 ns against Java's 40." },
+  { dishonest:120.2, honest:19.3, flag:"-O3", says:"At -O3 the plain functions take 19 ns, the fastest time on this page. The class code is slower than at -O2." }
+];
+const max = 3234.6;
+const $ = id => document.getElementById(id);
+function show() {
+  const s = stops[$("dial").value];
+  $("dv").textContent = Math.round(s.dishonest).toLocaleString() + " ns";
+  $("hv").textContent = Math.round(s.honest).toLocaleString() + " ns";
+  $("df").style.width = Math.max(s.dishonest / max * 100, 0.5) + "%";
+  $("hf").style.width = Math.max(s.honest / max * 100, 0.5) + "%";
+  $("says").textContent = s.says;
+  $("flag").textContent = s.flag;
+  $("err").textContent = "class ±" + s.derr + " ns, functions ±" + s.herr + " ns";
+}
+function showPython() {
+  const s = pystops[$("pdial").value];
+  $("pdv").textContent = Math.round(s.dishonest).toLocaleString() + " ns";
+  $("phv").textContent = Math.round(s.honest).toLocaleString() + " ns";
+  $("pdf").style.width = Math.max(s.dishonest / max * 100, 0.5) + "%";
+  $("phf").style.width = Math.max(s.honest / max * 100, 0.5) + "%";
+  $("psays").textContent = s.says;
+}
+function showCpp() {
+  const s = cppstops[$("cdial").value];
+  $("cdv").textContent = Math.round(s.dishonest).toLocaleString() + " ns";
+  $("chv").textContent = Math.round(s.honest).toLocaleString() + " ns";
+  $("cdf").style.width = Math.max(s.dishonest / max * 100, 0.5) + "%";
+  $("chf").style.width = Math.max(s.honest / max * 100, 0.5) + "%";
+  $("csays").textContent = s.says;
+}
+function showJs() {
+  const s = jsstops[$("jdial").value];
+  $("jdv").textContent = Math.round(s.dishonest).toLocaleString() + " ns";
+  $("jhv").textContent = Math.round(s.honest).toLocaleString() + " ns";
+  $("jdf").style.width = Math.max(s.dishonest / max * 100, 0.5) + "%";
+  $("jhf").style.width = Math.max(s.honest / max * 100, 0.5) + "%";
+  $("jsays").textContent = s.says;
+}
+$("jdial").addEventListener("input", showJs);
+$("cdial").addEventListener("input", showCpp);
+$("dial").addEventListener("input", show);
+$("pdial").addEventListener("input", showPython);
+$("power").addEventListener("change", e => {
+  document.body.classList.toggle("power", e.target.checked);
+  try { localStorage.setItem("power", e.target.checked ? "1" : ""); } catch (_) {}
+});
+try { if (localStorage.getItem("power")) { $("power").checked = true; document.body.classList.add("power"); } } catch (_) {}
+show();
+showPython();
+showJs();
+showCpp();
+const hooks = [
+  { t:"Python is a compiled language.", c:"CPython compiles every file to bytecode before it runs. The catch: bytecode is not machine code.", h:"/python.html", a:"" },
+  { t:"Java is slower than Python.", c:"True with the JIT off: 3,235 ns against 1,531 ns. The catch: nobody runs Java that way.", h:"/java.html", a:"" },
+  { t:"Python beat C++ on my machine.", c:"The C++ chased pointers. The catch: memory layout mattered more than language.", h:"/memory.html", a:"" },
+  { t:"C++ is slower than Python.", c:"True with no optimization: 2,027 ns against 1,531 ns. The catch: nobody ships that build. At -O1 it takes 162 ns.", h:"/", a:"#cpp" },
+  { t:"Java is faster than C++.", c:"True on our class code: 40 ns against 106 ns. The catch: on plain functions the two are close, 23 ns against 19 to 25 ns.", h:"/java.html", a:"" },
+  { t:"JavaScript is faster than Go.", c:"True on our class code: 124 ns against 311 ns. The catch: on plain functions Go wins, 43 ns against 99 ns.", h:"/javascript.html", a:"" },
+  { t:"Python runs five times faster with this one simple trick.", c:"The one thing is the implementation: PyPy takes 270 ns where CPython takes 1,531 ns. The catch: PyPy implements Python 3.11.", h:"/python.html", a:"" },
+  { t:"PHP is twice as fast with one setting.", c:"The setting is the tracing JIT: 929 ns down to 446 ns. The catch: it is off by default.", h:"/php.html", a:"" },
+  { t:"Memory layout can slow you down more than choice of language.", c:"True at 1 GB in C++: 271 ns against 3.6 ns per item. The catch: at 16 KB the layout does not matter.", h:"/memory.html", a:"" },
+  { t:"More optimization made my C++ slower.", c:"True on class code: 120 ns at -O3 against 106 ns at -O2. The catch: plain functions got faster, 25 ns down to 19 ns.", h:"/", a:"#cpp" },
+  { t:"Languages have no speed.", c:"Implementations do. PyPy runs Python 5.7 times faster than CPython, and one JVM differs by 80 times between JIT settings.", h:"/objections.html", a:"" },
+  { t:"Compiled Java is more than 2x slower than PHP or Python.", c:"Static compilation without JIT optimization. Java's speed does not come from static compilation.", h:"/java.html", a:"" },
+  { t:"Python (and JavaScript and Ruby and PHP) is NOT an interpreted language.", c:"A true interpreter walks a syntax tree. Any VM that reads any kind of byte code is not an interpreter.", h:"/objections.html", a:"" },
+  { t:"Well written python beats poorly written C++", c:"Accessing memory from within a loop if the C++ uses inefficient memory layouts and Python uses good ones. The point is not that C++ is faster than Python when both use efficient memory layouts. The point is that a poor choice on memory layouts can slow you down by about 4,800%.", h:"/memory.html", a:"" }
+];
+function showHook(i) {
+  $("hooktext").textContent = hooks[i].t;
+  $("hookcatch").textContent = hooks[i].c;
+  $("hooklink").href = hooks[i].h + "?h=" + (i + 1) + hooks[i].a;
+}
+let hi = Math.floor(Math.random() * hooks.length);
+showHook(hi);
+setInterval(() => {
+  hi = (hi + 1) % hooks.length;
+  showHook(hi);
+}, 7000);
+</script>
+</main>
+<footer>
+<p>Is it compiled or interpreted? <a href="/python.html">Python</a> &middot; <a href="/java.html">Java</a> &middot; <a href="/javascript.html">JavaScript</a> &middot; <a href="/typescript.html">TypeScript</a> &middot; <a href="/cpp.html">C++</a> &middot; <a href="/csharp.html">C#</a> &middot; <a href="/go.html">Go</a> &middot; <a href="/rust.html">Rust</a> &middot; <a href="/kotlin.html">Kotlin</a> &middot; <a href="/swift.html">Swift</a> &middot; <a href="/ruby.html">Ruby</a> &middot; <a href="/php.html">PHP</a> &middot; <a href="/lua.html">Lua</a> &middot; <a href="/perl.html">Perl</a></p>
+<p><a href="/compiled-vs-interpreted.html">Compiled vs interpreted</a> &middot; <a href="/languages.html">All languages</a> &middot; <a href="/objections.html">Objections</a> &middot; <a href="/check-our-work.html">Check our work</a></p>
+<p class="byline">By Adam Zachary Wasserman. Updated <time datetime="2026-10-05">5 October 2026</time>. Every number comes from <a href="/check-our-work.html">code you can rerun</a>.</p>
+</footer>
+</body>
+</html>

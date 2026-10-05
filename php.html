@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is PHP Compiled or Interpreted? The Short Answer</title>
+<meta name="description" content="PHP is compiled to opcodes, then run by a virtual machine. PHP compiles each script to opcodes, and the Zend Engine runs them.">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<meta name="author" content="Adam Zachary Wasserman">
+<link rel="canonical" href="https://isitcompiled.com/php.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0c'/%3E%3Ctext x='4' y='23' font-family='monospace' font-size='18' font-weight='700' fill='%232a9d8f'%3E%3E_%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="isitcompiled.com">
+<meta property="og:title" content="Is PHP Compiled or Interpreted? The Short Answer">
+<meta property="og:description" content="PHP is compiled to opcodes, then run by a virtual machine. PHP compiles each script to opcodes, and the Zend Engine runs them.">
+<meta property="og:url" content="https://isitcompiled.com/php.html">
+<meta property="og:image" content="https://isitcompiled.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Is PHP Compiled or Interpreted? The Short Answer">
+<meta name="twitter:description" content="PHP is compiled to opcodes, then run by a virtual machine. PHP compiles each script to opcodes, and the Zend Engine runs them.">
+<meta name="twitter:image" content="https://isitcompiled.com/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "Is PHP Compiled or Interpreted? The Short Answer", "description": "PHP is compiled to opcodes, then run by a virtual machine. PHP compiles each script to opcodes, and the Zend Engine runs them.", "url": "https://isitcompiled.com/php.html", "mainEntityOfPage": "https://isitcompiled.com/php.html", "datePublished": "2026-10-05", "dateModified": "2026-10-05", "inLanguage": "en", "author": {"@type": "Person", "name": "Adam Zachary Wasserman", "url": "https://honestcode.software", "sameAs": ["https://github.com/adamzwasserman"]}, "publisher": {"@type": "Organization", "name": "isitcompiled.com", "url": "https://isitcompiled.com/"}, "image": "https://isitcompiled.com/og.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Is it compiled?", "item": "https://isitcompiled.com/"}, {"@type": "ListItem", "position": 2, "name": "Is PHP compiled?", "item": "https://isitcompiled.com/php.html"}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is PHP interpreted or compiled?", "acceptedAnswer": {"@type": "Answer", "text": "PHP compiles each script to opcodes before it runs, and the Zend Engine executes them. The opcode cache saves the compiled opcodes."}}, {"@type": "Question", "name": "What is OPcache?", "acceptedAnswer": {"@type": "Answer", "text": "OPcache keeps compiled PHP opcodes in memory so PHP does not compile a script again on every request."}}, {"@type": "Question", "name": "Does PHP have a JIT?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. PHP 8 added a JIT inside OPcache, with tracing and function modes. It is off by default."}}]}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Literata:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0c; --fg:#c8c8d0; --muted:#9a9aa8; --bar:#e63946; --bar2:#2a9d8f; --bar3:#e63946; --gold:#e9c46a; --line:#1e1e26; --box:#111116; --mono:'JetBrains Mono',ui-monospace,monospace; --serif:'Literata',Georgia,serif; }
+  body { background:var(--bg); color:var(--fg); font:18px/1.6 var(--serif); max-width:42rem; margin:0 auto; padding:2rem 1rem; }
+  h1 { font-size:1.6rem; line-height:1.25; }
+  h1 em { font-style:normal; text-transform:uppercase; border-bottom:3px solid var(--bar2); }
+  h2 { font-size:1.2rem; margin-top:2rem; }
+  a { color:var(--bar2); }
+  nav { display:flex; flex-wrap:wrap; gap:1rem; font-size:.95rem; border-bottom:1px solid var(--line); padding-bottom:.75rem; margin-bottom:1.5rem; }
+  footer { border-top:1px solid var(--line); margin-top:3rem; padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  table { border-collapse:collapse; width:100%; font-size:.95rem; }
+  th, td { text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--line); }
+  td.n, th.n { text-align:right; }
+  h1, h2, nav, .label, .stops, label.power, th, code, pre, .callout { font-family:var(--mono); }
+  h1, h2 { color:var(--fg); }
+  input { accent-color:var(--bar2); }
+  .answer { border-left:4px solid var(--gold); background:var(--box); padding:.75rem 1rem; border-radius:0 6px 6px 0; font-size:1.05rem; }
+  .byline { color:var(--muted); font-size:.9rem; }
+  h3 { font-size:1rem; font-family:var(--mono); margin-top:1.5rem; }
+</style>
+</head>
+<body>
+<nav><a href="/">Speed</a><a href="/memory.html">Memory</a><a href="/languages.html">Languages</a><a href="/objections.html">Objections</a><a href="/check-our-work.html">Check our work</a></nav>
+<main>
+<h1>Is PHP compiled or interpreted?</h1>
+<p class="answer">PHP is compiled to opcodes, then run by a virtual machine. PHP compiles each script to opcodes, and the Zend Engine runs them.</p>
+<h2>How it runs your code</h2>
+<p>The opcode cache stores the compiled opcodes, so PHP skips the compile on later requests. PHP 8 adds a JIT in two modes, called tracing and function. Both are part of the opcode cache, and both are off by default.</p>
+<h2>Does that make PHP slow?</h2>
+<p>The tracing JIT roughly halved our times. It cut the class code from 929 to 446 ns and the plain functions from 579 to 302 ns. Java with the full JIT is still about 11 times faster than PHP with the tracing JIT on the class code.</p>
+<h2>What we measured</h2>
+<p>One small program, an order with items, a coupon, a discount and tax, written as an average programmer would write it. Times are nanoseconds per call.</p>
+<table><tr><th>Setting</th><th class="n">Class code</th><th class="n">Plain functions</th></tr><tr><td>No opcode cache</td><td class="n">929</td><td class="n">579</td></tr><tr><td>Opcode cache</td><td class="n">866</td><td class="n">505</td></tr><tr><td>Opcode cache and tracing JIT</td><td class="n">446</td><td class="n">302</td></tr><tr><td>Opcode cache and function JIT</td><td class="n">612</td><td class="n">329</td></tr></table>
+<p>Each figure is the median of three runs of the program's own timing loop: 1,000 iterations between two clock reads, median of 200 batches, on PHP 8.5.4.</p>
+<h2>Questions</h2>
+<h3>Is PHP interpreted or compiled?</h3>
+<p>PHP compiles each script to opcodes before it runs, and the Zend Engine executes them. The opcode cache saves the compiled opcodes.</p>
+<h3>What is OPcache?</h3>
+<p>OPcache keeps compiled PHP opcodes in memory so PHP does not compile a script again on every request.</p>
+<h3>Does PHP have a JIT?</h3>
+<p>Yes. PHP 8 added a JIT inside OPcache, with tracing and function modes. It is off by default.</p>
+<h2>Related</h2>
+<p><a href="/ruby.html">Is Ruby compiled?</a> &middot; <a href="/python.html">Is Python compiled?</a> &middot; <a href="/javascript.html">Is JavaScript compiled?</a> &middot; <a href="/compiled-vs-interpreted.html">Compiled vs interpreted</a> &middot; <a href="/">Why optimization decides speed</a></p>
+</main>
+<footer>
+<p>Is it compiled or interpreted? <a href="/python.html">Python</a> &middot; <a href="/java.html">Java</a> &middot; <a href="/javascript.html">JavaScript</a> &middot; <a href="/typescript.html">TypeScript</a> &middot; <a href="/cpp.html">C++</a> &middot; <a href="/csharp.html">C#</a> &middot; <a href="/go.html">Go</a> &middot; <a href="/rust.html">Rust</a> &middot; <a href="/kotlin.html">Kotlin</a> &middot; <a href="/swift.html">Swift</a> &middot; <a href="/ruby.html">Ruby</a> &middot; <a href="/php.html">PHP</a> &middot; <a href="/lua.html">Lua</a> &middot; <a href="/perl.html">Perl</a></p>
+<p><a href="/compiled-vs-interpreted.html">Compiled vs interpreted</a> &middot; <a href="/languages.html">All languages</a> &middot; <a href="/objections.html">Objections</a> &middot; <a href="/check-our-work.html">Check our work</a></p>
+<p class="byline">By Adam Zachary Wasserman. Updated <time datetime="2026-10-05">5 October 2026</time>. Every number comes from <a href="/check-our-work.html">code you can rerun</a>.</p>
+</footer>
+</body>
+</html>

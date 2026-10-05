@@ -1,0 +1,298 @@
+# isitcompiled.com: full text
+
+Almost every popular language compiles your code. Speed comes from optimization, which happens either before the program runs or while it runs. A language has no speed of its own. Each implementation has one, and it depends on how much optimization its authors built in.
+
+## Is Python compiled or interpreted?
+URL: https://isitcompiled.com/python.html
+
+Python is compiled to bytecode first, and a virtual machine then runs the bytecode. The standard implementation, CPython, has no JIT by default, so it never turns your code into machine code.
+
+CPython compiles each source file to bytecode when you run or import it, and it saves the result in .pyc files. A virtual machine then runs the bytecode. Python's own documentation calls that virtual machine “the interpreter”, and the name causes most of the confusion. A real interpreter executes the source text or the syntax tree directly and repeats the translation work as it goes. Shell scripts, early BASIC, Ruby 1.8 and Tcl before version 8.0 worked that way. CPython does not.
+
+CPython 3.11 and later adapt the bytecode as the program runs, which speeds up code that runs often. CPython 3.14 has an experimental JIT that is off by default. We turned it on, and our program did not get faster. PyPy, a different Python implementation, has a full JIT. It ran our program about five times faster than CPython.
+
+Times in nanoseconds per call (class code, plain functions):
+- CPython 3.14, no JIT: 1,531, 708
+- CPython 3.14, experimental JIT on: 1,570, 662
+- PyPy 7.3.20, JIT: 270, 135
+PyPy implements Python 3.11, so it runs a different language version from CPython 3.14. The PyPy class-code times ranged from 202 to 467 ns.
+
+Q: Is Python slow because it is interpreted?
+A: Not for that reason. CPython compiles to bytecode and runs it on a virtual machine, and it has no JIT by default. PyPy, which has a JIT, ran our program about five times faster.
+
+Q: What is a .pyc file?
+A: CPython saves compiled bytecode in .pyc files inside __pycache__ folders, so it can skip the compile step the next time you import the module.
+
+Q: Does Python ever produce machine code?
+A: Not by default. Nuitka compiles Python to C, Cython translates Python-like code to C, and PyPy compiles hot code to machine code while the program runs.
+
+## Is Java compiled or interpreted?
+URL: https://isitcompiled.com/java.html
+
+Java is both: the compiler javac turns source into bytecode before the program runs, and the JVM compiles hot bytecode into machine code while the program runs.
+
+javac does almost no optimizing. The JVM starts the program on the bytecode and watches which methods run often. It compiles those methods into machine code with a JIT compiler. HotSpot, the JVM in OpenJDK, has two JIT compilers, a first tier and a second tier, and the default uses both. With the JIT off, the JVM never makes machine code.
+
+Nearly all of Java's speed comes from the JIT. With the full JIT, the class version of our program allocated about 0 bytes per call, because HotSpot saw that the Order object never left the method and removed it. The plain-function version still allocated 56 bytes per call.
+
+Times in nanoseconds per call (class code, plain functions):
+- JIT off (-Xint): 3,235, 2,464
+- First-tier JIT only: 212, 128
+- Second-tier JIT only: 48, 35
+- Full JIT (default): 40, 23
+Java with the JIT off is slower than CPython on this program. Nobody runs Java that way, and that is the point: the JIT is where the speed comes from. Runs used OpenJDK 21 with JMH, three forks of five one-second iterations.
+
+Q: Does Java compile to machine code?
+A: javac produces bytecode. The JVM compiles hot bytecode to machine code with its JIT. GraalVM Native Image can also compile a Java program ahead of time into a native executable.
+
+Q: Why is Java fast if it runs on a virtual machine?
+A: Because of the JIT. In our test the full JIT took the class version of the program from 3,235 ns to 40 ns per call.
+
+Q: What is the JVM?
+A: The Java Virtual Machine runs bytecode. HotSpot is the JVM in OpenJDK, and it includes the JIT compilers.
+
+## Is JavaScript compiled or interpreted?
+URL: https://isitcompiled.com/javascript.html
+
+JavaScript is compiled. V8, the engine in Chrome and Node, compiles each function to bytecode the first time the program calls it, and it compiles hot code into machine code.
+
+V8 does not read your JavaScript line by line. Each function is compiled before it executes. Hot code gets another compile that produces optimized machine code. You can switch the machine code off with the --jitless flag. Other engines work differently: QuickJS runs bytecode without a JIT.
+
+With the JIT on, V8 runs our class code about 14 times faster than with it off, and the plain functions about 9 times faster. With the JIT off, V8 lands close to CPython.
+
+Times in nanoseconds per call (class code, plain functions):
+- JIT off (--jitless): 1,699, 856
+- Optimizing compilers off (--no-opt): 1,226, 587
+- Default: 124, 99
+We ran the TypeScript version of the program on Node 22 with mitata, one process per setting, so the table has no spread figure. Against C++ built with -O2, V8 is 17 percent slower on the class code (124 against 106 ns) and about four times slower on the plain functions (99 against 25 ns).
+
+Q: Is JavaScript an interpreted language?
+A: Not in the usual sense. V8 compiles each function before it runs, and it compiles hot code to machine code. Some small engines, such as QuickJS, run bytecode with no JIT.
+
+Q: Does V8 compile JavaScript to machine code?
+A: Yes, for code that runs often. V8 first compiles functions to bytecode, then compiles hot functions to optimized machine code.
+
+Q: Is TypeScript compiled?
+A: Yes. The TypeScript compiler checks types and emits JavaScript, and a JavaScript engine then runs that JavaScript.
+
+## Is TypeScript compiled or interpreted?
+URL: https://isitcompiled.com/typescript.html
+
+TypeScript is compiled to JavaScript, and the JavaScript is then compiled and optimized by an engine such as V8. TypeScript itself adds no speed and costs none at run time, because the compiler erases the types.
+
+The TypeScript compiler, tsc, checks your types and emits JavaScript. The types do not reach the running program. A JavaScript engine then runs the output, and V8 compiles each function to bytecode and hot code to machine code. Deno and Bun run TypeScript files directly by stripping the types first.
+
+TypeScript's speed is JavaScript's speed. We measured our program as TypeScript on Node 22, so the V8 numbers below are the TypeScript numbers.
+
+Times in nanoseconds per call (class code, plain functions):
+- JIT off (--jitless): 1,699, 856
+- Optimizing compilers off (--no-opt): 1,226, 587
+- Default: 124, 99
+Measured with mitata, one process per setting, so there is no spread figure. See the JavaScript page for the comparison with C++ and Go.
+
+Q: Is TypeScript interpreted?
+A: No. It is compiled to JavaScript, and the JavaScript engine compiles and optimizes that code.
+
+Q: Do types make TypeScript code faster?
+A: No. The compiler erases types, so the running program does not see them.
+
+Q: Can I run TypeScript without compiling it first?
+A: Deno and Bun run TypeScript files directly. They strip the types and run the JavaScript that remains.
+
+## Is C++ compiled or interpreted?
+URL: https://isitcompiled.com/cpp.html
+
+C++ is compiled ahead of time to machine code by a compiler such as GCC, Clang or MSVC. It does not need a virtual machine, and its speed depends on the optimization level you build with.
+
+A C++ compiler turns your source into machine code before the program runs, and a linker joins the pieces into an executable. The CPU runs that executable directly. Interpreters for C++ exist, such as Cling, but almost nobody uses one to run production programs.
+
+The optimizer works before the program starts, and you choose how hard it works with a flag: -O0 for none, then -O1, -O2 and -O3. In our test, C++ built with -O0 was slower than CPython, and -O1 made the class code about 12 times faster.
+
+Times in nanoseconds per call (class code, plain functions):
+- -O0 (no optimization): 2,027, 562
+- -O1: 162, 37
+- -O2: 106, 25
+- -O3: 120, 19
+g++ 15.2.0 with Google Benchmark, five repetitions. The class code is slower at -O3 than at -O2, and the plain functions are faster.
+
+Q: Is C++ interpreted?
+A: No. C++ is compiled ahead of time to machine code. Interpreters such as Cling exist, but production C++ does not use them.
+
+Q: Why is C++ fast?
+A: Its compiler optimizes before the program runs, and the program runs directly on the CPU. Built with no optimization, our C++ program was slower than CPython.
+
+Q: Does C++ need a virtual machine?
+A: No. A C++ executable runs directly on the processor with no virtual machine.
+
+## Is C# compiled or interpreted?
+URL: https://isitcompiled.com/csharp.html
+
+C# is compiled twice: the C# compiler produces intermediate language (IL), and the .NET runtime compiles the IL to machine code with a JIT while the program runs. .NET can also compile ahead of time.
+
+The C# compiler, Roslyn, turns your source into IL inside an assembly. When you run the program, the .NET runtime compiles methods to machine code with its JIT, in tiers: a quick first compile and a better one for hot methods. ReadyToRun and NativeAOT compile ahead of time instead. Mono, another .NET runtime, also has an interpreter mode for platforms that forbid generating machine code.
+
+C# follows the pattern Java shows: much of its speed comes from the runtime's JIT, and you can choose ahead-of-time compilation when you want fast startup or no JIT. We have not published C# timings on this site.
+
+Q: Is C# compiled or interpreted?
+A: It is compiled. The C# compiler produces IL, and the .NET runtime compiles IL to machine code while the program runs or ahead of time.
+
+Q: What is IL?
+A: Intermediate language is the bytecode-like format that .NET compilers produce. It is the input to the .NET JIT.
+
+Q: Can C# run without a JIT?
+A: Yes. NativeAOT compiles a program ahead of time to a native executable, and Mono has an interpreter mode.
+
+## Is Go compiled or interpreted?
+URL: https://isitcompiled.com/go.html
+
+Go is compiled ahead of time to native machine code by its standard compiler. It has no virtual machine, but every Go program carries a runtime that includes a garbage collector.
+
+The gc compiler turns Go source into machine code and usually links a single static executable. go run compiles your program to a temporary executable and then runs it. The runtime inside the executable schedules goroutines and collects garbage.
+
+Go's optimizer works before the program runs. In the harness behind this site, Go took 311 ns on our class code and 43 ns on the plain functions, measured with go test and b.Loop.
+
+Q: Is Go interpreted?
+A: No. Go is compiled ahead of time to machine code.
+
+Q: Does Go have a virtual machine?
+A: No. Go programs run directly on the CPU, but they include a runtime with a garbage collector and a goroutine scheduler.
+
+Q: Why does go run seem like a script?
+A: It compiles your program to a temporary executable, runs it, and then discards it.
+
+## Is Rust compiled or interpreted?
+URL: https://isitcompiled.com/rust.html
+
+Rust is compiled ahead of time to machine code, through the LLVM compiler backend. It has no virtual machine and no garbage collector.
+
+The Rust compiler, rustc, checks ownership and borrowing rules, then LLVM turns the program into machine code. Debug builds use no optimization. Release builds, made with cargo build --release, use optimization level 3 by default. Miri, an interpreter for Rust, exists to detect undefined behavior, and nobody uses it to run production programs.
+
+Rust's speed comes from ahead-of-time optimization, like C++, and from having no garbage collector. A debug build can run far slower than a release build, so always time a release build.
+
+Q: Is Rust interpreted?
+A: No. Rust is compiled ahead of time to machine code. Miri is an interpreter for checking programs, not for running them.
+
+Q: Does Rust have a garbage collector?
+A: No. Rust frees memory through its ownership rules at compile time.
+
+Q: Why are Rust debug builds slow?
+A: Debug builds turn optimization off. Release builds turn it on.
+
+## Is Kotlin compiled or interpreted?
+URL: https://isitcompiled.com/kotlin.html
+
+Kotlin is compiled. On the JVM, its compiler produces bytecode, and HotSpot's JIT compiles hot bytecode to machine code exactly as it does for Java. Kotlin/Native compiles to machine code ahead of time.
+
+The Kotlin compiler, kotlinc, targets several platforms. For the JVM it emits bytecode that the JVM runs and the JIT optimizes. Kotlin/Native produces native executables. Kotlin/JS emits JavaScript.
+
+On the JVM, Kotlin's speed is Java's speed, because the JVM's JIT compiles the bytecode. Turn the JIT off and it slows down by the amounts shown on the Java page.
+
+Q: Is Kotlin compiled to Java bytecode?
+A: On the JVM, yes. Kotlin can also compile to native code with Kotlin/Native and to JavaScript with Kotlin/JS.
+
+Q: Is Kotlin slower than Java?
+A: Kotlin on the JVM runs through Java's JIT, so equivalent code usually runs at a similar speed.
+
+Q: Does Kotlin need a JVM?
+A: Only for the JVM target. Kotlin/Native produces executables without one.
+
+## Is Swift compiled or interpreted?
+URL: https://isitcompiled.com/swift.html
+
+Swift is compiled ahead of time to machine code through the LLVM compiler backend. It has no virtual machine and no tracing garbage collector.
+
+The Swift compiler, swiftc, turns your source into machine code before the program runs. Memory is managed by automatic reference counting, which frees objects when their last reference goes away. Swift can run scripts and a REPL, but production Swift is compiled.
+
+Swift's optimizer works before the program runs, and you choose between an unoptimized debug build and an optimized release build. Always time a release build.
+
+Q: Is Swift interpreted?
+A: No. Swift is compiled ahead of time to machine code, even though it offers a REPL and scripts for convenience.
+
+Q: Does Swift have a garbage collector?
+A: No. Swift uses automatic reference counting.
+
+Q: What compiler does Swift use?
+A: swiftc, which uses LLVM to produce machine code.
+
+## Is Ruby compiled or interpreted?
+URL: https://isitcompiled.com/ruby.html
+
+Ruby is compiled to bytecode, then run by a virtual machine. Ruby 1.8 was a real interpreter that walked the syntax tree. Ruby 1.9 replaced it with YARV, which compiles your source to bytecode first.
+
+Ruby 3.3 runs the bytecode on the YARV virtual machine. Ruby also has a JIT called YJIT, which you switch on. The Ruby in our test image comes from a Debian build that leaves YJIT out, so we have no JIT numbers for Ruby.
+
+We cannot show what the JIT does for Ruby. Our numbers show Ruby without a JIT: slower than CPython and slower than PHP, on both the class code and the plain functions.
+
+Times in nanoseconds per call (class code, plain functions):
+- Ruby 3.3.8, no JIT: 2,260, 1,150
+Measured with benchmark-ips. The class-code runs gave 2.26 and 2.36 microseconds per call, and the plain-function runs gave 1.15 and 1.16.
+
+Q: Is Ruby interpreted?
+A: Not in the old sense. Ruby 1.8 walked a syntax tree. Since Ruby 1.9, YARV compiles source to bytecode and a virtual machine runs it.
+
+Q: Does Ruby have a JIT?
+A: Yes. YJIT is an optional JIT in the standard implementation. JRuby and TruffleRuby have JITs too.
+
+Q: How fast is Ruby without a JIT?
+A: On our program, Ruby 3.3.8 took 2,260 ns for the class code and 1,150 ns for plain functions.
+
+## Is PHP compiled or interpreted?
+URL: https://isitcompiled.com/php.html
+
+PHP is compiled to opcodes, then run by a virtual machine. PHP compiles each script to opcodes, and the Zend Engine runs them.
+
+The opcode cache stores the compiled opcodes, so PHP skips the compile on later requests. PHP 8 adds a JIT in two modes, called tracing and function. Both are part of the opcode cache, and both are off by default.
+
+The tracing JIT roughly halved our times. It cut the class code from 929 to 446 ns and the plain functions from 579 to 302 ns. Java with the full JIT is still about 11 times faster than PHP with the tracing JIT on the class code.
+
+Times in nanoseconds per call (class code, plain functions):
+- No opcode cache: 929, 579
+- Opcode cache: 866, 505
+- Opcode cache and tracing JIT: 446, 302
+- Opcode cache and function JIT: 612, 329
+Each figure is the median of three runs of the program's own timing loop: 1,000 iterations between two clock reads, median of 200 batches, on PHP 8.5.4.
+
+Q: Is PHP interpreted or compiled?
+A: PHP compiles each script to opcodes before it runs, and the Zend Engine executes them. The opcode cache saves the compiled opcodes.
+
+Q: What is OPcache?
+A: OPcache keeps compiled PHP opcodes in memory so PHP does not compile a script again on every request.
+
+Q: Does PHP have a JIT?
+A: Yes. PHP 8 added a JIT inside OPcache, with tracing and function modes. It is off by default.
+
+## Is Lua compiled or interpreted?
+URL: https://isitcompiled.com/lua.html
+
+Lua is compiled to bytecode, and a small virtual machine runs the bytecode. Standard Lua has no JIT. LuaJIT, a separate implementation, does.
+
+Lua compiles source code to bytecode when it loads a script, and its register-based virtual machine runs the bytecode. The standard implementation is small and does little optimizing. LuaJIT compiles hot code to machine code and runs many programs several times faster, which shows again that speed belongs to the implementation and not to the language.
+
+We have not measured Lua on this site. The pattern matches Python and Ruby: with no JIT, the virtual machine steps through bytecode, and an implementation with a JIT removes most of that cost.
+
+Q: Is Lua interpreted?
+A: Standard Lua compiles to bytecode and runs it on a virtual machine. It does not execute source text directly.
+
+Q: Does Lua have a JIT?
+A: Standard Lua does not. LuaJIT does.
+
+Q: Why is LuaJIT faster than Lua?
+A: LuaJIT compiles hot code to machine code while the program runs. Standard Lua keeps stepping through bytecode.
+
+## Is Perl compiled or interpreted?
+URL: https://isitcompiled.com/perl.html
+
+Perl compiles your whole program to an internal tree of operations before it runs, and then it runs the tree. It does not produce bytecode, and it has no JIT.
+
+Perl 5 builds an op tree in memory and executes it by walking the tree in order. The tree is not saved to disk, so Perl has no bytecode file the way Python has .pyc files. Perl is therefore not quite a bytecode virtual machine, and it is not a line-by-line interpreter either.
+
+We have not measured Perl on this site. Perl has no JIT, so its speed comes from the care that went into the interpreter loop and its operations.
+
+Q: Is Perl interpreted or compiled?
+A: Both words fit loosely. Perl compiles the whole program to an op tree first, then executes the tree.
+
+Q: Does Perl compile to bytecode?
+A: No. Perl keeps an op tree in memory. It does not save bytecode.
+
+Q: Does Perl have a JIT?
+A: No mainstream Perl implementation has a JIT.

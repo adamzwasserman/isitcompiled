@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memory Layout vs Language: Python Can Beat C++</title>
+<meta name="description" content="C++ reading scattered objects takes 42.6 ns per item. A Python loop on a flat array takes 21.2 ns. Memory layout can matter more than language.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Literata:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0c; --fg:#c8c8d0; --muted:#9a9aa8; --bar:#e9c46a; --bar2:#2a9d8f; --bar3:#e63946; --gold:#e9c46a; --line:#1e1e26; --box:#111116; --mono:'JetBrains Mono',ui-monospace,monospace; --serif:'Literata',Georgia,serif; }
+  body { background:var(--bg); color:var(--fg); font:18px/1.6 var(--serif); max-width:42rem; margin:0 auto; padding:2rem 1rem; }
+  h1 { font-size:1.6rem; line-height:1.25; }
+  h2 { font-size:1.2rem; margin-top:2rem; }
+  input[type=range] { width:100%; }
+  .stops { display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); }
+  .row { margin:1rem 0; }
+  .label { display:flex; justify-content:space-between; font-size:.95rem; }
+  .track { background:var(--box); height:1.6rem; border-radius:4px; overflow:hidden; }
+  .fill { height:100%; background:var(--bar); transition:width .3s; }
+  .fill.good { background:var(--bar2); }
+  .fill.bad { background:var(--bar3); }
+  .note { background:var(--box); padding:.75rem 1rem; border-radius:6px; }
+  .tech { display:none; font-size:.85rem; color:var(--muted); border-top:1px solid var(--line); margin-top:1.5rem; padding-top:1rem; }
+  body.power .tech { display:block; }
+  .tech code { background:var(--box); padding:0 .25rem; }
+  label.power { font-size:.9rem; color:var(--muted); margin-left:auto; }
+  nav { display:flex; flex-wrap:wrap; gap:1rem; font-size:.95rem; border-bottom:1px solid var(--line); padding-bottom:.75rem; margin-bottom:1.5rem; }
+  footer { border-top:1px solid var(--line); margin-top:3rem; padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  a { color:var(--bar2); }
+  h1, h2, nav, .label, .stops, label.power, th, code, pre, .callout { font-family:var(--mono); }
+  h1, h2 { color:var(--fg); }
+  input { accent-color:var(--bar2); }
+</style>
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<meta name="author" content="Adam Zachary Wasserman">
+<link rel="canonical" href="https://isitcompiled.com/memory.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0c'/%3E%3Ctext x='4' y='23' font-family='monospace' font-size='18' font-weight='700' fill='%232a9d8f'%3E%3E_%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="isitcompiled.com">
+<meta property="og:title" content="Memory Layout vs Language: Python Can Beat C++">
+<meta property="og:description" content="C++ reading scattered objects takes 42.6 ns per item. A Python loop on a flat array takes 21.2 ns. Memory layout can matter more than language.">
+<meta property="og:url" content="https://isitcompiled.com/memory.html">
+<meta property="og:image" content="https://isitcompiled.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Memory Layout vs Language: Python Can Beat C++">
+<meta name="twitter:description" content="C++ reading scattered objects takes 42.6 ns per item. A Python loop on a flat array takes 21.2 ns. Memory layout can matter more than language.">
+<meta name="twitter:image" content="https://isitcompiled.com/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "Memory Layout vs Language: Python Can Beat C++", "description": "C++ reading scattered objects takes 42.6 ns per item. A Python loop on a flat array takes 21.2 ns. Memory layout can matter more than language.", "url": "https://isitcompiled.com/memory.html", "mainEntityOfPage": "https://isitcompiled.com/memory.html", "datePublished": "2026-10-05", "dateModified": "2026-10-05", "inLanguage": "en", "author": {"@type": "Person", "name": "Adam Zachary Wasserman", "url": "https://honestcode.software", "sameAs": ["https://github.com/adamzwasserman"]}, "publisher": {"@type": "Organization", "name": "isitcompiled.com", "url": "https://isitcompiled.com/"}, "image": "https://isitcompiled.com/og.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Is it compiled?", "item": "https://isitcompiled.com/"}, {"@type": "ListItem", "position": 2, "name": "Memory layout", "item": "https://isitcompiled.com/memory.html"}]}]}</script>
+</head>
+<body>
+<nav><a href="/">Speed</a><a href="/memory.html">Memory</a><a href="/languages.html">Languages</a><a href="/objections.html">Objections</a><a href="/check-our-work.html">Check our work</a><label class="power"><input type="checkbox" id="power"> Show technical details</label></nav>
+<main>
+<h1>Python can beat C++ when the C++ chases pointers.</h1>
+<p>Here is the catch. How your data sits in memory can matter more than which language you use. Once the data outgrows the processor caches, a program that reads records scattered across memory waits on memory for almost every record. This is a well-known effect, and the page shows its size on one real machine, with code you can rerun.</p>
+
+<h2>One set of records in three layouts</h2>
+<p>This C++ program adds up one field of every record. Add more records and watch the time per record.</p>
+<input type="range" id="sdial" min="0" max="3" value="0" step="1" aria-label="Amount of data">
+<div class="stops"><span>16 KB</span><span>1 MB</span><span>32 MB</span><span>1 GB</span></div>
+
+<div class="row"><div class="label"><span>Records in one flat array</span><span id="av"></span></div><div class="track"><div class="fill good" id="af"></div></div></div>
+<div class="row"><div class="label"><span>Separate objects, visited in random order</span><span id="ov"></span></div><div class="track"><div class="fill" id="of"></div></div></div>
+<div class="row"><div class="label"><span>Linked list</span><span id="lv"></span></div><div class="track"><div class="fill bad" id="lf"></div></div></div>
+<p class="note" id="ssays"></p>
+
+<h2>Now the catch</h2>
+<p>We gave five languages one job: walk through 33.5 million items and read each one, doing nothing else. Each bar shows the time to read one item. C++ appears twice, once reading a flat array and once reading separate objects scattered through memory.</p>
+<div id="cmp"></div>
+<p class="note">A Python loop that reads a flat array is about twice as fast as a C++ loop that must chase pointers. Memory layout matters much more than language. Fix the memory layout, and C++ reads a flat array using 0.9 ns per element, about 24 times faster than Python.</p>
+
+<div class="tech">
+  <p><strong>Not a study.</strong> The effect is textbook. Ulrich Drepper's paper &ldquo;What Every Programmer Should Know About Memory&rdquo; is the standard reference. The page shows how large it is on one machine.</p>
+  <p><strong>Machine:</strong> a rented eight-core virtual machine, which hides its real cache layout. Each loop ran on one pinned core, and each figure is a median of five repetitions from one hand-written loop.</p>
+  <p><strong>First dial:</strong> C++ adds one field across N records of 32 bytes. The three layouts are a contiguous array of structs, separate heap objects visited in random order, and a linked list at random addresses. The stops are 512, 32,768, 1,048,576 and 33,554,432 records. Java and Go follow this pattern: at 1 GB the random-order objects take 60.6 ns (Java) and 18.7 ns (Go) per record, against 3.2 and 3.3 ns for a flat array.</p>
+  <p><strong>Second block:</strong> a read with no arithmetic, at 33,554,432 elements. Python reads <code>array('q')</code> with <code>for x in a</code>, PHP uses <code>foreach</code> over a packed array, Ruby uses <code>a[i]</code> in a <code>while</code> loop, Node reads a <code>Float64Array</code>, and C++ reads either an array or scattered heap objects. The totals include loop cost. An empty loop shaped like the read took 18 to 19 ns in Python and 0.2 ns in C++.</p>
+  <p><strong>Data:</strong> <code>honest-code-traces/measured/layout</code> and <code>measured/layout-raw</code>.</p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const sizes = [
+  { a:0.535, o:0.647, l:1.621,   says:"At 16 KB everything fits in the first cache level, and layout does not matter." },
+  { a:1.023, o:2.499, l:21.546,  says:"At 1 MB the scattered layouts begin to cost more. The linked list takes about 21 times longer per record than the flat array." },
+  { a:3.279, o:23.608, l:148.062, says:"At 32 MB the data no longer fits in cache. Scattered objects take 7 times longer per record, and the linked list takes 45 times longer." },
+  { a:3.573, o:56.283, l:271.347, says:"At 1 GB scattered objects take about 16 times longer per record, and the linked list takes 76 times longer." }
+];
+const smax = 271.347;
+const fmt = v => (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString()) + " ns";
+function showSize() {
+  const s = sizes[$("sdial").value];
+  [["a","av","af"],["o","ov","of"],["l","lv","lf"]].forEach(([k,v,f]) => {
+    $(v).textContent = fmt(s[k]);
+    $(f).style.width = Math.max(s[k] / smax * 100, 0.5) + "%";
+  });
+  $("ssays").textContent = s.says;
+}
+const cmp = [
+  { name:"C++, scattered objects", ns:42.636, cls:"bad" },
+  { name:"Ruby, while loop", ns:32.5, cls:"" },
+  { name:"Python, for loop over an array", ns:21.2, cls:"" },
+  { name:"PHP, foreach over an array", ns:7.7, cls:"" },
+  { name:"Node, loop over a Float64Array", ns:1.6, cls:"" },
+  { name:"C++, flat array", ns:0.872, cls:"good" }
+];
+$("cmp").innerHTML = cmp.map(c => '<div class="row"><div class="label"><span>' + c.name + '</span><span>' + fmt(c.ns) + '</span></div><div class="track"><div class="fill ' + c.cls + '" style="width:' + Math.max(c.ns / 42.636 * 100, 0.5) + '%"></div></div></div>').join("");
+$("sdial").addEventListener("input", showSize);
+$("power").addEventListener("change", e => {
+  document.body.classList.toggle("power", e.target.checked);
+  try { localStorage.setItem("power", e.target.checked ? "1" : ""); } catch (_) {}
+});
+try { if (localStorage.getItem("power")) { $("power").checked = true; document.body.classList.add("power"); } } catch (_) {}
+showSize();
+</script>
+</main>
+<footer>
+<p>Is it compiled or interpreted? <a href="/python.html">Python</a> &middot; <a href="/java.html">Java</a> &middot; <a href="/javascript.html">JavaScript</a> &middot; <a href="/typescript.html">TypeScript</a> &middot; <a href="/cpp.html">C++</a> &middot; <a href="/csharp.html">C#</a> &middot; <a href="/go.html">Go</a> &middot; <a href="/rust.html">Rust</a> &middot; <a href="/kotlin.html">Kotlin</a> &middot; <a href="/swift.html">Swift</a> &middot; <a href="/ruby.html">Ruby</a> &middot; <a href="/php.html">PHP</a> &middot; <a href="/lua.html">Lua</a> &middot; <a href="/perl.html">Perl</a></p>
+<p><a href="/compiled-vs-interpreted.html">Compiled vs interpreted</a> &middot; <a href="/languages.html">All languages</a> &middot; <a href="/objections.html">Objections</a> &middot; <a href="/check-our-work.html">Check our work</a></p>
+<p class="byline">By Adam Zachary Wasserman. Updated <time datetime="2026-10-05">5 October 2026</time>. Every number comes from <a href="/check-our-work.html">code you can rerun</a>.</p>
+</footer>
+</body>
+</html>

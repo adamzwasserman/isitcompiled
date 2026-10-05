@@ -1,0 +1,31 @@
+# isitcompiled.com
+
+> Is it compiled or interpreted? Almost every popular language compiles your code. Speed comes from optimization, which happens either before the program runs or while it runs. Every number is measured and rerunnable.
+
+Author: Adam Zachary Wasserman. Data and code: https://github.com/adamzwasserman/honest-code-traces
+
+## Start here
+- [Speed comes from optimization](https://isitcompiled.com/): measured times for Java, Python, JavaScript and C++ at each optimizer setting
+- [Compiled vs interpreted: what the words mean](https://isitcompiled.com/compiled-vs-interpreted.html): definitions of compiler, bytecode, JIT and interpreter
+- [All languages at a glance](https://isitcompiled.com/languages.html): how 14 languages run, and whether each has a JIT
+
+## Is it compiled? One page per language
+- [Python](https://isitcompiled.com/python.html): Python is compiled to bytecode first, and a virtual machine then runs the bytecode. The standard implementation, CPython, has no JIT by default, so it never turns your code into machine code.
+- [Java](https://isitcompiled.com/java.html): Java is both: the compiler javac turns source into bytecode before the program runs, and the JVM compiles hot bytecode into machine code while the program runs.
+- [JavaScript](https://isitcompiled.com/javascript.html): JavaScript is compiled. V8, the engine in Chrome and Node, compiles each function to bytecode the first time the program calls it, and it compiles hot code into machine code.
+- [TypeScript](https://isitcompiled.com/typescript.html): TypeScript is compiled to JavaScript, and the JavaScript is then compiled and optimized by an engine such as V8. TypeScript itself adds no speed and costs none at run time, because the compiler erases the types.
+- [C++](https://isitcompiled.com/cpp.html): C++ is compiled ahead of time to machine code by a compiler such as GCC, Clang or MSVC. It does not need a virtual machine, and its speed depends on the optimization level you build with.
+- [C#](https://isitcompiled.com/csharp.html): C# is compiled twice: the C# compiler produces intermediate language (IL), and the .NET runtime compiles the IL to machine code with a JIT while the program runs. .NET can also compile ahead of time.
+- [Go](https://isitcompiled.com/go.html): Go is compiled ahead of time to native machine code by its standard compiler. It has no virtual machine, but every Go program carries a runtime that includes a garbage collector.
+- [Rust](https://isitcompiled.com/rust.html): Rust is compiled ahead of time to machine code, through the LLVM compiler backend. It has no virtual machine and no garbage collector.
+- [Kotlin](https://isitcompiled.com/kotlin.html): Kotlin is compiled. On the JVM, its compiler produces bytecode, and HotSpot's JIT compiles hot bytecode to machine code exactly as it does for Java. Kotlin/Native compiles to machine code ahead of time.
+- [Swift](https://isitcompiled.com/swift.html): Swift is compiled ahead of time to machine code through the LLVM compiler backend. It has no virtual machine and no tracing garbage collector.
+- [Ruby](https://isitcompiled.com/ruby.html): Ruby is compiled to bytecode, then run by a virtual machine. Ruby 1.8 was a real interpreter that walked the syntax tree. Ruby 1.9 replaced it with YARV, which compiles your source to bytecode first.
+- [PHP](https://isitcompiled.com/php.html): PHP is compiled to opcodes, then run by a virtual machine. PHP compiles each script to opcodes, and the Zend Engine runs them.
+- [Lua](https://isitcompiled.com/lua.html): Lua is compiled to bytecode, and a small virtual machine runs the bytecode. Standard Lua has no JIT. LuaJIT, a separate implementation, does.
+- [Perl](https://isitcompiled.com/perl.html): Perl compiles your whole program to an internal tree of operations before it runs, and then it runs the tree. It does not produce bytecode, and it has no JIT.
+
+## Evidence and objections
+- [Memory layout vs language](https://isitcompiled.com/memory.html): data layout can matter more than the language
+- [Objections](https://isitcompiled.com/objections.html): eight common objections and the answers
+- [Check our work](https://isitcompiled.com/check-our-work.html): tools, versions, data and limits
