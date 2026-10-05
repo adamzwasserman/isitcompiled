@@ -5,7 +5,7 @@ Almost every popular language compiles your code. Speed comes from optimization,
 ## Is Python compiled or interpreted?
 URL: https://isitcompiled.com/python.html
 
-Python is compiled to bytecode first, and a virtual machine then runs the bytecode. The standard implementation, CPython, has no JIT by default, so it never turns your code into machine code.
+Python is often called interpreted, but it is compiled to bytecode first, and a virtual machine then runs the bytecode. The standard implementation, CPython, has no JIT by default, so it never turns your code into machine code.
 
 CPython compiles each source file to bytecode when you run or import it, and it saves the result in .pyc files. A virtual machine then runs the bytecode. Python's own documentation calls that virtual machine “the interpreter”, and the name causes most of the confusion. A real interpreter executes the source text or the syntax tree directly and repeats the translation work as it goes. Shell scripts, early BASIC, Ruby 1.8 and Tcl before version 8.0 worked that way. CPython does not.
 
@@ -16,6 +16,9 @@ Times in nanoseconds per call (class code, plain functions):
 - CPython 3.14, experimental JIT on: 1,570, 662
 - PyPy 7.3.20, JIT: 270, 135
 PyPy implements Python 3.11, so it runs a different language version from CPython 3.14. The PyPy class-code times ranged from 202 to 467 ns.
+
+Q: Is Python an interpreted language?
+A: It is often called one, but the label fits an implementation better than a language. CPython compiles source to bytecode and a virtual machine runs it, and PyPy compiles hot code to machine code. Python's documentation calls the virtual machine the interpreter.
 
 Q: Is Python slow because it is interpreted?
 A: Not for that reason. CPython compiles to bytecode and runs it on a virtual machine, and it has no JIT by default. PyPy, which has a JIT, ran our program about five times faster.
@@ -41,6 +44,9 @@ Times in nanoseconds per call (class code, plain functions):
 - Second-tier JIT only: 48, 35
 - Full JIT (default): 40, 23
 Java with the JIT off is slower than CPython on this program. Nobody runs Java that way, and that is the point: the JIT is where the speed comes from. Runs used OpenJDK 21 with JMH, three forks of five one-second iterations.
+
+Q: Is Java an interpreted language?
+A: Not as a whole. javac compiles source to bytecode, and the JVM compiles hot bytecode to machine code. With the JIT off, using the -Xint flag, the JVM runs bytecode without making machine code.
 
 Q: Does Java compile to machine code?
 A: javac produces bytecode. The JVM compiles hot bytecode to machine code with its JIT. GraalVM Native Image can also compile a Java program ahead of time into a native executable.

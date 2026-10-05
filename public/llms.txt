@@ -10,7 +10,7 @@ Author: Adam Zachary Wasserman. Data and code: https://github.com/adamzwasserman
 - [All languages at a glance](https://isitcompiled.com/languages.html): how 14 languages run, and whether each has a JIT
 
 ## Is it compiled? One page per language
-- [Python](https://isitcompiled.com/python.html): Python is compiled to bytecode first, and a virtual machine then runs the bytecode. The standard implementation, CPython, has no JIT by default, so it never turns your code into machine code.
+- [Python](https://isitcompiled.com/python.html): Python is often called interpreted, but it is compiled to bytecode first, and a virtual machine then runs the bytecode. The standard implementation, CPython, has no JIT by default, so it never turns your code into machine code.
 - [Java](https://isitcompiled.com/java.html): Java is both: the compiler javac turns source into bytecode before the program runs, and the JVM compiles hot bytecode into machine code while the program runs.
 - [JavaScript](https://isitcompiled.com/javascript.html): JavaScript is compiled. V8, the engine in Chrome and Node, compiles each function to bytecode the first time the program calls it, and it compiles hot code into machine code.
 - [TypeScript](https://isitcompiled.com/typescript.html): TypeScript is compiled to JavaScript, and the JavaScript is then compiled and optimized by an engine such as V8. TypeScript itself adds no speed and costs none at run time, because the compiler erases the types.
