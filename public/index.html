@@ -241,7 +241,7 @@ const hooks = [
 function showHook(i) {
   $("hooktext").textContent = hooks[i].t;
   $("hookcatch").textContent = hooks[i].c;
-  $("hooklink").href = hooks[i].h + "?h=" + (i + 1) + hooks[i].a;
+  $("hooklink").href = hooks[i].h + "?utm_source=banner&utm_medium=hook&utm_content=hook" + (i + 1) + hooks[i].a;
 }
 let hi = Math.floor(Math.random() * hooks.length);
 showHook(hi);
